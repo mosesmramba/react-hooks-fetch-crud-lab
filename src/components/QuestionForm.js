@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 
 function QuestionForm(props) {
+ console.log (props)
+  
   const [formData, setFormData] = useState({
     prompt: "",
     answer1: "",
@@ -15,11 +17,41 @@ function QuestionForm(props) {
       ...formData,
       [event.target.name]: event.target.value,
     });
+    
   }
 
   function handleSubmit(event) {
     event.preventDefault();
-    console.log(formData);
+
+    const newQuestion = {
+      prompt: formData.prompt,
+      answers: [formData.answer1, formData.answer2, formData.answer3, formData.answer4],
+      correctIndex: parseInt(formData.correctIndex),
+    };
+
+    fetch("http://localhost:4000/questions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(newQuestion),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        
+        setFormData({
+          prompt: "",
+          answer1: "",
+          answer2: "",
+          answer3: "",
+          answer4: "",
+          correctIndex: 0,
+        });
+      })
+      .catch((error) => {
+        console.error("Failed to reach the server", error);
+      });
+   
   }
 
   return (
@@ -88,6 +120,6 @@ function QuestionForm(props) {
       </form>
     </section>
   );
-}
 
+}
 export default QuestionForm;
